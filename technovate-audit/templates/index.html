@@ -1,0 +1,346 @@
+<!DOCTYPE html>
+<html lang="en-GB">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>The ONE Partner Audit | Technovate.One</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Quicksand:wght@500;600;700&family=Inter:wght@400;500;600&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="/static/style.css">
+<script>
+  window.CONSULTANT = {{ 'true' if consultant else 'false' }};
+  window.CALENDLY_URL = {{ calendly_url | tojson }};
+  window.CONTACT_EMAIL = {{ contact_email | tojson }};
+</script>
+</head>
+<body>
+
+<header class="top">
+  <img src="https://technovate.one/wp-content/uploads/2026/02/Technovate-Logo-white.svg" alt="Technovate.One"
+       onerror="this.outerHTML='<span class=logotype>technovate.<b>one</b></span>'">
+  <span class="top-tag">The ONE Partner Audit</span>
+  <span id="consultant-flag" class="consultant hidden">Consultant mode</span>
+</header>
+
+<main id="app">
+
+  <!-- ============================ SCREEN: HERO / LANE ============================ -->
+  <section id="screen-hero" class="screen">
+    <canvas id="hero-canvas" width="560" height="560" aria-hidden="true"></canvas>
+    <p class="eyebrow">A free working assessment from Technovate.One</p>
+    <h1>How many hands touch <span class="gword">one change</span><br>before it ships?</h1>
+    <div class="pipeline" aria-hidden="true">
+      <span class="node">Idea</span><span class="hand">→</span>
+      <span class="node">Vendor A</span><span class="hand">→</span>
+      <span class="node">Vendor B</span><span class="hand">→</span>
+      <span class="node">Internal IT</span><span class="hand">→</span>
+      <span class="node">Rework</span><span class="hand">→</span>
+      <span class="node live">Live</span>
+    </div>
+    <p class="lede">Every handoff adds cost, delay and someone new to blame. Ten minutes shows you where it is costing you, in your own figures, and the first move to close it. The verdict is computed, even when it is not what you want to hear.</p>
+
+    <h2 class="pick-title">Which seat are you in?</h2>
+    <div class="lanes">
+      <button class="lane-card" data-lane="business">
+        <span class="lane-kicker">Lane one</span>
+        <span class="lane-name">I lead a business</span>
+        <span class="lane-desc">The Fragmentation Audit. For leaders juggling vendors, legacy platforms, data gaps and stalled AI.</span>
+      </button>
+      <button class="lane-card" data-lane="partner">
+        <span class="lane-kicker">Lane two</span>
+        <span class="lane-name">I run a delivery firm</span>
+        <span class="lane-desc">The Co Delivery Margin Finder. For SIs, MSPs and consultancies leaving margin on the bench or turning work away.</span>
+      </button>
+    </div>
+    <p class="fineprint">No cost, no obligation. Your full report is emailed to you at the end.</p>
+    <div id="resume-banner" class="resume hidden">
+      <span>You have an audit in progress.</span>
+      <button id="resume-yes">Pick up where I left off</button>
+      <button id="resume-no" class="ghost">Start again</button>
+    </div>
+  </section>
+
+  <!-- ============================ SCREEN: QUESTIONS ============================ -->
+  <section id="screen-questions" class="screen surface hidden">
+    <div class="progress"><div id="progress-bar"></div></div>
+    <p id="q-count" class="q-count"></p>
+    <h2 id="q-text"></h2>
+    <p id="q-why" class="q-why"></p>
+    <div id="q-options" class="q-options"></div>
+    <div id="q-freetext" class="q-freetext">
+      <textarea id="q-input" rows="3" placeholder="Or say it in your own words"></textarea>
+      <button id="q-mic" class="mic" title="Speak your answer" aria-label="Speak your answer">🎤</button>
+    </div>
+    <div class="q-actions">
+      <button id="q-next" class="primary">Next</button>
+      <button id="q-notsure" class="ghost">Not sure? Ask me a different way</button>
+      <button id="q-skip" class="ghost hidden">Skip this one</button>
+    </div>
+  </section>
+
+  <!-- ============================ SCREEN: SIZING ============================ -->
+  <section id="screen-sizing" class="screen surface hidden">
+    <h2 id="sizing-title"></h2>
+    <p class="q-why" id="sizing-why"></p>
+    <div id="sizing-fields" class="sizing-grid"></div>
+    <p class="formula" id="sizing-formula"></p>
+    <div class="q-actions">
+      <button id="sizing-next" class="primary">Next</button>
+      <button id="sizing-skip" class="ghost">Skip the numbers</button>
+    </div>
+  </section>
+
+  <!-- ============================ SCREEN: LOADING ============================ -->
+  <section id="screen-loading" class="screen surface hidden center">
+    <div class="spinner" aria-hidden="true"></div>
+    <p id="loading-msg">Reading your answers</p>
+  </section>
+
+  <!-- ============================ SCREEN: GATE ============================ -->
+  <section id="screen-gate" class="screen surface hidden">
+    <h2>Your report is ready</h2>
+    <div id="gate-teaser" class="teaser"></div>
+    <p class="q-why">The full report: your verdict, the cost in your own figures, your blind spot, each pain mapped to the Technovate fix, a 90 day plan, and where every answer went. Tell us where to send it.</p>
+    <div class="gate-form">
+      <input id="g-first" placeholder="First name" required>
+      <input id="g-last" placeholder="Last name" required>
+      <input id="g-company" placeholder="Company" required>
+      <input id="g-email" type="email" placeholder="Work email" required>
+    </div>
+    <p id="gate-error" class="error hidden"></p>
+    <button id="gate-submit" class="primary">Show my report</button>
+    <p class="fineprint">We email you this report and nothing else without asking first.</p>
+  </section>
+
+  <!-- ============================ SCREEN: REPORT ============================ -->
+  <section id="screen-report" class="screen surface hidden">
+    <p class="eyebrow">Your ONE Partner Audit report</p>
+    <h2 id="r-headline"></h2>
+    <p id="r-sent" class="sent hidden">Sent to your inbox ✓</p>
+
+    <div class="howfits">
+      <strong>How this report fits together.</strong>
+      <ol>
+        <li><b>The verdict.</b> Your score across four pillars, and where you sit on the scale.</li>
+        <li><b>The cost.</b> What the gaps keep costing every month, in your own figures.</li>
+        <li><b>The exposure.</b> The specific risks your answers point at, including the one you have not named.</li>
+        <li><b>The map.</b> Every pain matched to the Technovate service and ONE Pod accountable for fixing it.</li>
+        <li><b>The plan.</b> One initiative first, the maths behind choosing it, and 90 days sequenced.</li>
+        <li><b>The receipts.</b> Where every answer you gave went, so you can check our working.</li>
+      </ol>
+    </div>
+
+    <!-- ================================ Part 1 ================================ -->
+    <div class="part">
+      <div class="part-head"><span class="pnum">1</span><div><h3>The verdict</h3>
+        <p class="part-lead">Scored 0 to 10 from your answers across four pillars. The verdict follows your weakest pillar, because everything you attempt passes through it first.</p></div></div>
+
+      <div class="sec">
+        <span class="kicker">Your verdict in 15 seconds</span>
+        <p id="r-plain" class="plain-summary"></p>
+        <div id="r-vcards" class="vcards"></div>
+      </div>
+
+      <div class="sec">
+        <span class="kicker">Where you sit</span>
+        <h4>The scale, and your place on it</h4>
+        <p class="sec-intro">Three bands, set by your weakest pillar: 7 or above is the top band, 4 to 6.9 the middle, under 4 the bottom. A 10 does not exist.</p>
+        <div id="r-ladder" class="ladder"></div>
+        <p id="r-verdict-reason"></p>
+      </div>
+
+      <div class="sec">
+        <span class="kicker">Four pillar scorecard</span>
+        <h4>Each pillar, scored from your answers</h4>
+        <p class="sec-intro" id="r-readiness-note"></p>
+        <div id="r-pillars" class="pillars"></div>
+      </div>
+
+      <div class="firstmove">
+        <span class="kicker">Your first move</span>
+        <h4 id="r-fm-action"></h4>
+        <p id="r-fm-why"></p>
+        <p class="sec-intro" style="margin:8px 0 0">Do this before any project, tool or spend. Everything else depends on it.</p>
+      </div>
+      <p class="bridge">That is where you stand. Next: what standing still costs.</p>
+    </div>
+
+    <!-- ================================ Part 2 ================================ -->
+    <div class="part">
+      <div class="part-head"><span class="pnum">2</span><div><h3>The cost</h3>
+        <p class="part-lead">What the gaps cost while they stay open. Every figure is computed from your numbers, never invented.</p></div></div>
+
+      <div class="sec">
+        <span class="kicker">Painkiller or vitamin</span>
+        <h4>Is this bleeding now, or insurance for later?</h4>
+        <div id="r-usecase" class="usecase"></div>
+      </div>
+
+      <div class="sec">
+        <span class="kicker">The number</span>
+        <h4>What doing nothing costs, in your own figures</h4>
+        <p class="sec-intro" id="r-cost-explain"></p>
+        <div id="r-cost-cards" class="cost-cards"></div>
+        <p class="formula" id="r-cost-formula"></p>
+      </div>
+
+      <p class="bridge">The cost is the symptom. Part 3 shows the exposure creating it.</p>
+    </div>
+
+    <!-- ================================ Part 3 ================================ -->
+    <div class="part">
+      <div class="part-head"><span class="pnum">3</span><div><h3>The exposure</h3>
+        <p class="part-lead">The risks your answers point at. Each traces to a Part 1 pillar and has a mapped fix in Part 4.</p></div></div>
+
+      <div class="sec expose-card">
+        <span class="kicker">The blind spot</span>
+        <h4>The one thing you are not seeing</h4>
+        <p class="sec-intro">Every report names one risk the reader did not raise themselves. This is yours.</p>
+        <p id="r-blindspot"></p>
+      </div>
+
+      <div class="sec expose-card">
+        <span class="kicker" id="r-handoff-title">The handoff check</span>
+        <h4 id="r-handoff-sub">Connected systems, or bolted on parts?</h4>
+        <p id="r-handoff"></p>
+        <span id="r-risk" class="risk"></span>
+        <p id="r-risk-reason" class="sec-intro" style="margin-top:8px"></p>
+      </div>
+
+      <div class="sec expose-card">
+        <span class="kicker" id="r-shadow-title">Shadow AI</span>
+        <h4 id="r-shadow-sub">The AI use nobody signed off</h4>
+        <p id="r-shadow"></p>
+      </div>
+
+      <div class="sec expose-card">
+        <span class="kicker" id="r-ready-title">AI readiness</span>
+        <h4 id="r-ready-sub">Can your foundations carry your ambitions?</h4>
+        <p id="r-ready"></p>
+      </div>
+
+      <p class="bridge">Every risk above is a pain with a mapped fix. Part 4 draws the map.</p>
+    </div>
+
+    <!-- ================================ Part 4 ================================ -->
+    <div class="part">
+      <div class="part-head"><span class="pnum">4</span><div><h3>The map: every pain to its fix</h3>
+        <p class="part-lead">Each pain matched to the Technovate service and ONE Pod accountable for fixing it.</p></div></div>
+
+      <div class="sec">
+        <span class="kicker">The six services doing the work</span>
+        <p class="sec-intro">Every fix below names one of these, so accountability is never vague.</p>
+        <div class="service-legend" id="r-service-legend"></div>
+      </div>
+
+      <div class="sec">
+        <span class="kicker">Your pain, in your words</span>
+        <h4>Matched to the service accountable for it</h4>
+        <p class="sec-intro">Left: what you told us and the question it answered. Right: the Technovate service and ONE Pod that fixes it.</p>
+        <div id="r-map" class="painmap"></div>
+      </div>
+
+      <div class="sec">
+        <span class="kicker">Where to start</span>
+        <h4>The ranking, and the maths behind it</h4>
+        <p class="sec-intro">One initiative first, because fixing everything at once stalls. Scored: impact 35, readiness 25, speed 20, fit 20, out of 10. Bands: 8 plus Exceptional fit · 6.5 to 8 Strong candidate · 5 to 6.5 Viable with preparation · under 5 Not yet.</p>
+        <div id="r-ranking"></div>
+      </div>
+
+      <p class="bridge">A map is not a plan. Part 5 sequences it: one initiative first, then the rest in order.</p>
+    </div>
+
+    <!-- ================================ Part 5 ================================ -->
+    <div class="part">
+      <div class="part-head"><span class="pnum">5</span><div><h3>The plan</h3>
+        <p class="part-lead">One initiative first, then 90 days sequenced. The first fix takes the biggest bite.</p></div></div>
+
+      <div class="sec">
+        <span class="kicker">Your 12 month goal</span>
+        <div class="goal-card"><span class="goal-label">In your words</span><p id="r-goal"></p><span class="goal-note">Every phase below is filtered through this. If a step does not serve it, it did not make the plan.</span></div>
+        <p class="goal-align" id="r-goal-align"></p>
+      </div>
+
+      <div class="sec">
+        <span class="kicker">Today and Day 90</span>
+        <h4>Current state, future state</h4>
+        <div class="state-cards">
+          <div class="state-card"><span class="state-tag">TODAY · CURRENT STATE</span><p id="r-current"></p></div>
+          <div class="state-card future"><span class="state-tag">DAY 90 · FUTURE STATE</span><p id="r-future"></p></div>
+        </div>
+      </div>
+
+      <div class="sec">
+        <span class="kicker">Your first 90 days</span>
+        <h4>Three phases, each with a named owner</h4>
+        <p class="sec-intro">Every phase names the Pod doing the work, so nothing is ownerless. Recovery figures are est., from your own numbers.</p>
+        <div id="r-phases"></div>
+      </div>
+
+      <div class="sec">
+        <span class="kicker">The trajectory</span>
+        <h4>The 90 day decline curves</h4>
+        <p class="sec-intro">What this still costs at each milestone, from your own figures.</p>
+        <div id="r-charts" class="charts"></div>
+      </div>
+
+      <div id="r-pilot" class="pilot"></div>
+
+      <div class="sec reach-grid">
+        <div><span class="kicker">Why now</span><h4>Why this is within reach</h4><p id="r-withinreach"></p></div>
+        <div><span class="kicker">The return</span><h4>Where the return comes from</h4><p id="r-returnfrom"></p></div>
+      </div>
+
+      <p class="bridge">If the plan looks right, check the workings. Part 6 shows them.</p>
+    </div>
+
+    <!-- ================================ Part 6 ================================ -->
+    <div class="part">
+      <div class="part-head"><span class="pnum">6</span><div><h3>The receipts</h3>
+        <p class="part-lead">Every answer changed something in this report. Here is the trace, so you can check our working.</p></div></div>
+
+      <div class="sec">
+        <span class="kicker">Where each answer went</span>
+        <h4>Trace every finding to your words</h4>
+        <table class="trace-table"><thead><tr><th>Your answer</th><th>What it changed</th></tr></thead><tbody id="r-trace"></tbody></table>
+        <p class="sec-intro" style="margin-top:10px">Nothing you told us was decorative.</p>
+      </div>
+
+      <div class="sec">
+        <span class="kicker">The wider picture</span>
+        <h4>You are not imagining the stakes</h4>
+        <div id="r-wider" class="wider"></div>
+        <p class="wider-note" id="r-wider-note"></p>
+      </div>
+
+      <div class="sec">
+        <span class="kicker">Appendix</span>
+        <h4>How to read this report</h4>
+        <p class="sec-intro">This glossary travels with the report when it gets forwarded to people who never saw the audit.</p>
+        <div id="r-glossary" class="glossary-grid"></div>
+      </div>
+    </div>
+
+    <div class="cta">
+      <h3 id="r-cta-line"></h3>
+      <p>The next step is a free working session with Technovate, not a sales call: current state on one side of the whiteboard, future state on the other. Bring your business leaders, not just IT. Bring this report.</p>
+      <a id="cta-book" class="primary btn" href="#" target="_blank" rel="noopener">Book the working session</a>
+      <div class="cta-row">
+        <button id="btn-email" class="ghost">Email me this report</button>
+        <button id="btn-print" class="ghost">Download one pager</button>
+        <button id="btn-share" class="ghost">Share on WhatsApp</button>
+        <button id="btn-restart" class="ghost">Start again</button>
+      </div>
+      <p class="fineprint">Prepared by Navvai for Technovate.One. This report was generated from the answers provided, scored against the methodology in the appendix. It is honest by design: where your answers exposed a weakness, the report says so, even where that costs the sale. Forward it freely; the appendix travels with it. Estimates are conservative, from your figures only, and are not guarantees.</p>
+    </div>
+  </section>
+
+</main>
+
+<footer class="foot">
+  <span>© Technovate.One · Delivery owned. Complexity navigated. Outcomes engineered.</span>
+</footer>
+
+<script src="/static/app.js"></script>
+</body>
+</html>
